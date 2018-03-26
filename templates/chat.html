@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<title>chat</title>
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+		<style>
+			ul#messages { list-style: none;}
+			ul#messages li { margin-bottom: 2px;}
+			ul#messages li img { margin-right: 10px;}
+
+			.timestamp {border: solid rgba(0, 0, 0, 0); background-color: rgba(0, 0, 0, 0.2);border-radius: 20px;margin-left: 10px;}
+			.avatar {width: 50px; vertical-align: middle;border-radius: 30px;}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<ul id="messages"></ul>
+				</div>
+			</div>
+		</div>
+		<form id="chatbox" role="form">
+			<div class="form-group">
+				<label for="message">Send message from {{.UserData.name}}</label>
+				Or  <a href="/logout">Sign out</a>
+				<textarea id="message" class="form-control"></textarea>
+			</div>
+			<input type="submit" value="send" class="btn btn-default">
+		</form>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script>
+			$(function() {
+				var socket = null;
+				var msgBox = $("#chatbox textarea");
+				var messages = $("#messages");
+				var formatTime = function (time) {
+					var date = new Date(time);
+					return "0".concat(date.getHours()).slice(-2) + ":" + "0".concat(date.getMinutes()).slice(-2) + ":" +  "0".concat(date.getSeconds()).slice(-2)
+				};
+				
+				$("#chatbox").submit(function() {
+					if (!msgBox.val()) {
+						return false;
+					}
+					if (!socket) {
+						alert("Error: WebSocket connection is missing.")
+						return false;
+					}
+					socket.send(JSON.stringify({Message: msgBox.val()}));
+					msgBox.val("");
+					msgBox.focus();
+					return false;
+				});
+
+				if (!window["WebSocket"]) {
+					alert("Error: WebSocket is unsupported by your browser.");
+				} else {
+					socket = new WebSocket("ws://{{.Host}}/room");
+					socket.onclose = function() {
+						alert("Socket is closed.");
+					}
+					socket.onmessage = function(e) {
+						var msg = JSON.parse(e.data);
+						messages.append(
+							$("<li>").append(
+								$("<img>").addClass("avatar").attr("src", msg.AvatarURL).attr("title", msg.Name).attr("alt", msg.Name),
+								$("<strong>").text(msg.Name + ": "),
+								$("<span>").text(msg.Message),
+								$("<span>").addClass("timestamp").text(formatTime(msg.When))
+							)
+							);
+					}
+				}
+			})
+		</script>
+	</body>
+</html>
