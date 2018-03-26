@@ -74,7 +74,7 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		socket:   socket,
 		send:     make(chan *model.Message, messageBufferSize),
 		room:     r,
-		userData: objx.MustFromBase64(authCookie.Value),
+		UserData: objx.MustFromBase64(authCookie.Value),
 	}
 	r.join <- client
 	defer func() { r.leave <- client }()

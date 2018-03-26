@@ -11,8 +11,8 @@ type Client struct {
 	socket *websocket.Conn
 	send   chan *model.Message
 	room   *room
-	// data in cookie
-	userData map[string]interface{}
+	// data in cookieUserData
+	UserData map[string]interface{}
 }
 
 func (c *Client) read() {
@@ -20,8 +20,8 @@ func (c *Client) read() {
 		var msg *model.Message
 		if err := c.socket.ReadJSON(&msg); err == nil {
 			msg.When = time.Now()
-			msg.Name = c.userData["name"].(string)
-			if avatarURL, ok := c.userData["avatar_url"]; ok {
+			msg.Name = c.UserData["name"].(string)
+			if avatarURL, ok := c.UserData["avatar_url"]; ok {
 				msg.AvatarURL = avatarURL.(string)
 			}
 			c.room.forward <- msg
