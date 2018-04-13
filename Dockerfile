@@ -6,9 +6,7 @@ RUN curl -fsSL -o /usr/local/bin/dep https://github.com/golang/dep/releases/down
 
 ADD . $GOPATH/src/chat-app
 WORKDIR $GOPATH/src/chat-app
-RUN dep ensure
-WORKDIR $GOPATH/src/chat-app
-RUN go build -o chat
+RUN dep ensure && go build -o chat
 
 ENV API_CLIENT_ID_GOOGLE="FIXME"
 ENV API_CLIENT_SECRET_GOOGLE="FIXME"
