@@ -36,6 +36,7 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.templ.Execute(w, data)
 }
 
+//TODO: use const
 func main() {
 	var addr = flag.String("addr", ":8080", "Application address.")
 	flag.Parse()
@@ -44,7 +45,7 @@ func main() {
 		google.New(os.Getenv("API_CLIENT_ID_GOOGLE"), os.Getenv("API_CLIENT_SECRET_GOOGLE"), "http://localhost:8080/auth/callback/google"),
 	)
 
-	r := NewRoom(UseGetAuthAvatar)
+	r := NewRoom(UseGetGravatarAvatar)
 	r.Tracer = tracer.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
