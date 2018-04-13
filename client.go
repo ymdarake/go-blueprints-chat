@@ -1,15 +1,14 @@
-package app
+package main
 
 import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/ymdarake/go-blueprints-chat/model"
 )
 
 type Client struct {
 	socket *websocket.Conn
-	send   chan *model.Message
+	send   chan *Message
 	room   *room
 	// data in cookieUserData
 	UserData map[string]interface{}
@@ -17,7 +16,7 @@ type Client struct {
 
 func (c *Client) read() {
 	for {
-		var msg *model.Message
+		var msg *Message
 		if err := c.socket.ReadJSON(&msg); err == nil {
 			msg.When = time.Now()
 			msg.Name = c.UserData["name"].(string)

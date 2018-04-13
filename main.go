@@ -13,8 +13,6 @@ import (
 
 	"github.com/stretchr/gomniauth"
 	"github.com/stretchr/gomniauth/providers/google"
-	"github.com/ymdarake/go-blueprints-chat/app"
-	"github.com/ymdarake/go-blueprints-chat/handler"
 	"github.com/ymdarake/go-blueprints-tracer/tracer"
 )
 
@@ -46,11 +44,11 @@ func main() {
 		google.New(os.Getenv("API_CLIENT_ID_GOOGLE"), os.Getenv("API_CLIENT_SECRET_GOOGLE"), "http://localhost:8080/auth/callback/google"),
 	)
 
-	r := app.NewRoom()
+	r := NewRoom(UseGetAuthAvatar)
 	r.Tracer = tracer.New(os.Stdout)
-	http.Handle("/chat", handler.MustAuth(&templateHandler{filename: "chat.html"}))
+	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
-	http.HandleFunc("/auth/", handler.LoginHandler)
+	http.HandleFunc("/auth/", LoginHandler)
 	http.Handle("/room", r)
 	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &http.Cookie{

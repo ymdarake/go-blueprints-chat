@@ -1,4 +1,4 @@
-package app
+package main
 
 import (
 	"log"
@@ -7,19 +7,20 @@ import (
 	"github.com/stretchr/objx"
 
 	"github.com/gorilla/websocket"
-	"github.com/ymdarake/go-blueprints-chat/model"
 	"github.com/ymdarake/go-blueprints-tracer/tracer"
 )
 
 type room struct {
 	// for message
-	forward chan *model.Message
+	forward chan *Message
 	// for joining Clients
 	join chan *Client
 	// for leaving Clients
 	leave chan *Client
 	// Clients in room
 	clients map[*Client]bool
+	// impl to get avatar url
+	getAvatar GetAvatar
 	// tracer receives manipulation logs on the room
 	Tracer tracer.Tracer
 }
@@ -72,7 +73,7 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	client := &Client{
 		socket:   socket,
-		send:     make(chan *model.Message, messageBufferSize),
+		send:     make(chan *Message, messageBufferSize),
 		room:     r,
 		UserData: objx.MustFromBase64(authCookie.Value),
 	}
@@ -82,12 +83,13 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	client.read()
 }
 
-func NewRoom() *room {
+func NewRoom(getAvatar GetAvatar) *room {
 	return &room{
-		forward: make(chan *model.Message),
-		join:    make(chan *Client),
-		leave:   make(chan *Client),
-		clients: make(map[*Client]bool),
-		Tracer:  tracer.Off(),
+		forward:   make(chan *Message),
+		join:      make(chan *Client),
+		leave:     make(chan *Client),
+		clients:   make(map[*Client]bool),
+		getAvatar: getAvatar,
+		Tracer:    tracer.Off(),
 	}
 }

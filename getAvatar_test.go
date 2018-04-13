@@ -1,14 +1,12 @@
-package service
+package main
 
 import (
 	"testing"
-
-	"github.com/ymdarake/go-blueprints-chat/app"
 )
 
 func TestGetAuthAvatar(t *testing.T) {
 	var getAuthAvatar GetAuthAvatar
-	client := new(app.Client)
+	client := new(Client)
 	url, err := getAuthAvatar.GetAvatarURL(client)
 	if err != ErrNoAvatarURL {
 		t.Error("should return ErrNoAvatarURL")
